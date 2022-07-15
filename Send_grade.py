@@ -3,6 +3,9 @@ import time
 import warnings
 from datetime import datetime
 
+from dotenv import load_dotenv
+
+
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -31,11 +34,17 @@ def getLS():
 
     clearConsole()
 
-    browser.find_element("id", 'p_user').send_keys("SHALMO4")
+    load_dotenv()
 
-    browser.find_element("id","p_sisma").send_keys("AlmogOpen98")
+    username = os.getenv('openU_username')
+    password = os.getenv('openU_password')
+    id = os.getenv('openU_id')
 
-    browser.find_element("id","p_mis_student").send_keys("209401553")
+    browser.find_element("id", 'p_user').send_keys(username)
+
+    browser.find_element("id","p_sisma").send_keys(password)
+
+    browser.find_element("id","p_mis_student").send_keys(id)
 
     browser.find_element("xpath",'//*[@id="login_sso"]/fieldset/input[1]').click()
 
