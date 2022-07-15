@@ -2,7 +2,7 @@ import os
 import discord
 import requests
 import json
-from Send_grade import getLS
+from Send_grade import getLastGrade
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,7 +41,7 @@ async def on_message(msg):
         tstmsg()
 
     if msg.content.startswith('$getLastGrade'):
-        grade = getLS()
+        grade = getLastGrade()
         await msg.channel.send(grade)
 
     if msg.content.startswith('$Quote'):

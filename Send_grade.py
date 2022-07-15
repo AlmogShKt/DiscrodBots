@@ -1,17 +1,18 @@
 import os
 import time
 import warnings
-from datetime import datetime
 
+#In order to use .env
+from datetime import datetime
 from dotenv import load_dotenv
 
-
+#In order to get grade table from openU site
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-def getLS():
+def getLastGrade():
     def clearConsole():
         command = 'clear'
         if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
@@ -19,7 +20,7 @@ def getLS():
         os.system(command)
 
     clearConsole()
-
+    #Set browser setting
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
     chrome_options.add_argument('--headless')
@@ -29,33 +30,33 @@ def getLS():
     browser = webdriver.Chrome(options=chrome_options ,\
         executable_path=r'/Users/almogshtaigmann/Downloads/chromedriver')
 
+    #openU webpage URL
     webpage = 'https://sheilta.apps.openu.ac.il/pls/dmyopt2/course_info.courses?p_from=1'
     browser.get(webpage)
 
     clearConsole()
 
+    #Get .env variables
     load_dotenv()
-
     username = os.getenv('openU_username')
     password = os.getenv('openU_password')
     id = os.getenv('openU_id')
 
+    #log in
     browser.find_element("id", 'p_user').send_keys(username)
-
     browser.find_element("id","p_sisma").send_keys(password)
-
     browser.find_element("id","p_mis_student").send_keys(id)
-
     browser.find_element("xpath",'//*[@id="login_sso"]/fieldset/input[1]').click()
 
+    #run until there is grade
     while True:
         browser.get(webpage)
         html = browser.page_source
         soup = BeautifulSoup(html,'html.parser')
-        tr_table=soup.find("table", {'class':'content_tbl'}).text
-        items=tr_table.split('\n')
-        print(items)
-        course_id = '20441'
+        tr_table = soup.find("table", {'class':'content_tbl'}).text
+        items = tr_table.split('\n')
+
+        course_id = '20441'#Java
         for i in range(len(items)):
             if course_id in items[i]:
                 if items[i-9].isdigit():
@@ -67,9 +68,12 @@ def getLS():
                     print(result)
                     return  result
                     message= { "value1" : result }
+
+                    #Option to send msg to mobile device by SMS
                     IFTTT_KEY='KEY'
                     IFTTT_URL='https://maker.ifttt.com/trigger/{EVENT_NAME_IN_IFTTT}/with/key/'+IFTTT_KEY
                     requests.post(IFTTT_URL,data=message)
+
                     exit()
                 else:
                     print("{0} No grade yet for Course {1}".format(datetime.now().strftime('%d/%m/%Y %H:%M:%S'),course_id))
